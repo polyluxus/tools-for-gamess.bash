@@ -1,19 +1,46 @@
 #! /bin/bash
 
-# GAMESS submission script
+###
 #
+# submit.gamess.sh -- 
+#   a script to submit a GAMESS calculation to a queuing system
+# Copyright (C) 2019 Martin C Schwarzer
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###
+
 # You might not want to make modifications here.
-# If you do improve it, I would be happy to learn about it.
-#
+# If you do improve the script, I would be happy to learn about it.
+
+### begin of script content ###
 
 # 
 # The help lines are distributed throughout the script and grepped for
 #
-#hlp   This script will sumbit an iGAMESS input file to the queueing system.
+#hlp   This script will sumbit an GAMESS input file to the queueing system.
 #hlp   It is designed to work on the RWTH compute cluster in 
 #hlp   combination with the slurm queueing system.
+#hlp   There are additional queues available, but they are untested and 
+#hlp   the header/settings are reproduced only from manuals.
 #hlp
-#hlp   This software comes with absolutely no warrenty. None. Nada.
+#hlp   submit.gamess.sh  Copyright (C) 2019  Martin C Schwarzer
+#hlp   This program comes with ABSOLUTELY NO WARRANTY; this is free software, 
+#hlp   and you are welcome to redistribute it under certain conditions; 
+#hlp   please see the license file distributed alongside this repository,
+#hlp   which is available when you type '${0##*/} license',
+#hlp   or at <https://github.com/polyluxus/tools-for-gamess.bash>.
 #hlp
 #hlp   Usage: $scriptname [options] [IPUT_FILE]
 #hlp
@@ -119,7 +146,7 @@ get_scriptpath_and_source_files ()
     source "$resourcespath/test_files.sh" &> "$tmplog" || (( error_count++ ))
     #shellcheck source=./resources/process_gamess.sh
     source "$resourcespath/process_gamess.sh" &> "$tmplog" || (( error_count++ ))
-    #shellcheck source=.&/resources/validate_numbers.sh
+    #shellcheck source=./resources/validate_numbers.sh
     source "$resourcespath/validate_numbers.sh" &> "$tmplog" || (( error_count++ ))
 
     if (( error_count > 0 )) ; then
@@ -183,9 +210,9 @@ write_jobscript ()
 
     local scale_memory_percent overhead_memory
     # Give GAMESS some more space by default (define in rc), 
-    # scale everything up, so that gamess uses max 75% of memory
-    # Not really sure that is necessary
-    scale_memory_percent=$(( 75 ))
+    # scale everything up, so that gamess uses max 90% of memory
+    # Not really sure that this is necessary, but as a failsafe it is worth having
+    scale_memory_percent=$(( 90 ))
     debug "Scaling memory by ${scale_memory_percent}% (requested_numCPU=${requested_numCPU})."
     overhead_memory=$(( (requested_memory + gamess_overhead) * 100 / scale_memory_percent ))
     debug "requested_memory=$requested_memory; gamess_overhead=$gamess_overhead"
@@ -269,7 +296,8 @@ write_jobscript ()
 			#SBATCH --output='$submitscript.o%j'
 			#SBATCH --error='$submitscript.e%j'
 			#SBATCH --nodes=1 
-			#SBATCH --ntasks=$requested_numCPU
+			#SBATCH --ntasks=1 
+			#SBATCH --cpus-per-task=$requested_numCPU
 			#SBATCH --mem-per-cpu=$(( overhead_memory / requested_numCPU ))
 			#SBATCH --time=${requested_walltime}
 			#SBATCH --mail-type=END,FAIL
@@ -354,6 +382,8 @@ write_jobscript ()
 			
 			GAMESS_RUN="\$( command -v rungms )" || exit 1
 			GAMESS_DIR="\${GAMESS_RUN%/*}"
+			
+			export GAMESS_DIR GAMESS_RUN
 			
 			EOF
     else
@@ -675,6 +705,17 @@ else
 fi
 
 get_scriptpath_and_source_files || exit 1
+
+if [[ "$1" =~ ^[Ll][Ii][Cc][Ee][Nn][Ss][Ee]$ ]] ; then
+  [[ -r "$scriptpath/LICENSE" ]] || fatal "No license file found. Your copy of the repository might be corrupted."
+  if command -v less &> /dev/null ; then
+    less "$scriptpath/LICENSE"
+  else
+    cat "$scriptpath/LICENSE"
+  fi
+  message "Displayed license and will exit."
+  exit 0
+fi
 
 # Check for settings in three default locations (increasing priority):
 #   install path of the script, user's home directory, current directory

@@ -16,3 +16,10 @@ Configuration of the script with the files
 in one of the directories:
 installation directory, `HOME`, `HOME/.config`, `PWD`.
 The last found file will be applied.
+
+## License
+
+GNU General Public License v3.0
+
+See [LICENSE](LICENSE) to see the full text.
+

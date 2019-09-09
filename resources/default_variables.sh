@@ -1,5 +1,26 @@
 #!/bin/bash
 
+###
+#
+# This file is part of tools-for-gamess.bash --
+#   a repository of scripts to prepare and submit GAMESS calculations 
+# Copyright (C) 2019 Martin C Schwarzer
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###
+
 # The following script gives default values to any of the scripts within the package.
 # They can (or should) be set in the rc file, too.
 
@@ -13,8 +34,8 @@ fi
 # Generic details about these tools 
 #
 softwarename="tools-for-gamess.bash"
-version="0.0.1"
-versiondate="2019-09-05"
+version="0.0.2"
+versiondate="2019-09-09"
 
 #
 # Standard commands for external software:
@@ -30,9 +51,10 @@ gamess_installpath="/path/is/not/set"
 gamess_scratch="default"
 # Define the overhead you'd like to give GAMESS in MB 
 gamess_overhead=2000
-#? The 2000 might be a very conservative guess, but additionally
-#? the memory will be scaled by 75% (at least in the submit script).
-#?
+# The 2000 might be a very conservative guess, nd should be adjusted as needed.
+# Additionally (internally) the requested memory will be scaled up so that the memory value
+# given to GAMESS is about 90% of the total memory requested from the queueing system.
+#
 # If a modular software management is available, use it?
 load_modules="true"
 # By default it takes the available path (at runtime) as this might include local directories
