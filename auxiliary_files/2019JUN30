@@ -1,0 +1,14 @@
+#%Module1.0###-*-tcl-*-#########################################################
+##
+## gamess module versionfile
+##
+
+# For the local install 
+set module_base_path "/home/rwth0425/modules/source"
+
+# Needs to be adjusted for what is to be loaded
+set version "2019JUN30"
+
+source "$module_base_path/gamess/gamess"
+
+###

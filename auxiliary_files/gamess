@@ -1,0 +1,68 @@
+#%Module1.0###-*-tcl-*-#########################################################
+##
+## gamess modulefile
+##
+set modulename "gamess"
+# Necessary for local installs
+set PROJECTHOME "/home/rwth0425"
+
+# Define local variable with path to installation software
+# version will be set by referring module file
+set SOFTWARE "${PROJECTHOME}/local/gamess/gamess-${version}-sockets"
+
+# Differ between different platforms (originally),
+# e.g. if the path depends on the plattform
+# (Removed because there is no reference to that further on,
+# as it is a precompiled package.)
+
+# This is the help output, printed by "module help"
+proc ModulesHelp { } {
+  # define the global variables modulename in this function
+  global version
+  global modulename
+  puts stderr "*** This module initialises the $modulename $version environment              ***"
+  puts stderr "    Gamess is a computational chemistry software program "
+  puts stderr "    and stands for General Atomic and Molecular Electronic"
+  puts stderr "    Structure System. "
+}
+# Short description (preferably 1 line) what the loaded software does,
+# or what the module is good for. 
+# Printed by "module whatis":
+module-whatis	"$modulename is a computational chemistry program package."
+
+# If module should be loaded, check for conflicts and print info
+switch [module-info mode] {
+  load {
+    # Is this module already loaded?
+    set conflict "$modulename/$version"
+    if { [is-loaded $conflict]} {
+      #print a yellow waring at the end of the line
+      puts stderr "$conflict already loaded, doing nothing"
+      return
+    }
+    # Is a different version already loaded?
+    set conflict $modulename
+    if { [is-loaded $conflict]} {
+      puts stderr "$conflict already loaded and conflicts with $modulename/$version.\nTry unloading $conflict first"
+      exit
+    }
+    # Check if software is really installed, if not error and abort.
+    if { ![file isdirectory $SOFTWARE] } {
+      puts stderr "This software is not installed on this machine. Please try another one."
+      break
+    }
+      
+    # Nothing failed, print a sucess message:
+    puts stderr "Loading $modulename $version"
+    puts stderr    "Note the interactive execution script: rungms"
+  }
+  unload {
+	puts stderr "Unloading $modulename"
+  }
+}
+
+# Prepend needed pathes for this software
+prepend-path PATH $SOFTWARE
+
+# ATTENTION: NO use of 'puts stderr' outside conditional expressions,
+# otherwise it would be printed on every load, unload, and even whatis command.
