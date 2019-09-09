@@ -1,10 +1,30 @@
 #! /bin/bash
 
-# GAMESS submission script
+###
 #
+# submit.gamess.sh -- 
+#   a script to submit a GAMESS calculation to a queuing system
+# Copyright (C) 2019 Martin C Schwarzer
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+###
+
 # You might not want to make modifications here.
-# If you do improve it, I would be happy to learn about it.
-#
+# If you do improve the script, I would be happy to learn about it.
+
+### begin of script content ###
 
 # 
 # The help lines are distributed throughout the script and grepped for
@@ -15,7 +35,12 @@
 #hlp   There are additional queues available, but they are untested and 
 #hlp   the header/settings are reproduced only from manuals.
 #hlp
-#hlp   This software comes with absolutely no warrenty. None. Nada.
+#hlp   submit.gamess.sh  Copyright (C) 2019  Martin C Schwarzer
+#hlp   This program comes with ABSOLUTELY NO WARRANTY; this is free software, 
+#hlp   and you are welcome to redistribute it under certain conditions; 
+#hlp   please see the license file distributed alongside this repository,
+#hlp   which is available when you type '${0##*/} license',
+#hlp   or at <https://github.com/polyluxus/tools-for-gamess.bash>.
 #hlp
 #hlp   Usage: $scriptname [options] [IPUT_FILE]
 #hlp
@@ -121,7 +146,7 @@ get_scriptpath_and_source_files ()
     source "$resourcespath/test_files.sh" &> "$tmplog" || (( error_count++ ))
     #shellcheck source=./resources/process_gamess.sh
     source "$resourcespath/process_gamess.sh" &> "$tmplog" || (( error_count++ ))
-    #shellcheck source=.&/resources/validate_numbers.sh
+    #shellcheck source=./resources/validate_numbers.sh
     source "$resourcespath/validate_numbers.sh" &> "$tmplog" || (( error_count++ ))
 
     if (( error_count > 0 )) ; then
@@ -680,6 +705,17 @@ else
 fi
 
 get_scriptpath_and_source_files || exit 1
+
+if [[ "$1" =~ ^[Ll][Ii][Cc][Ee][Nn][Ss][Ee]$ ]] ; then
+  [[ -r "$scriptpath/LICENSE" ]] || fatal "No license file found. Your copy of the repository might be corrupted."
+  if command -v less &> /dev/null ; then
+    less "$scriptpath/LICENSE"
+  else
+    cat "$scriptpath/LICENSE"
+  fi
+  message "Displayed license and will exit."
+  exit 0
+fi
 
 # Check for settings in three default locations (increasing priority):
 #   install path of the script, user's home directory, current directory
