@@ -13,8 +13,8 @@ fi
 # Generic details about these tools 
 #
 softwarename="tools-for-gamess.bash"
-version="0.0.1"
-versiondate="2019-09-05"
+version="0.0.2"
+versiondate="2019-09-09"
 
 #
 # Standard commands for external software:
@@ -30,9 +30,10 @@ gamess_installpath="/path/is/not/set"
 gamess_scratch="default"
 # Define the overhead you'd like to give GAMESS in MB 
 gamess_overhead=2000
-#? The 2000 might be a very conservative guess, but additionally
-#? the memory will be scaled by 75% (at least in the submit script).
-#?
+# The 2000 might be a very conservative guess, nd should be adjusted as needed.
+# Additionally (internally) the requested memory will be scaled up so that the memory value
+# given to GAMESS is about 90% of the total memory requested from the queueing system.
+#
 # If a modular software management is available, use it?
 load_modules="true"
 # By default it takes the available path (at runtime) as this might include local directories

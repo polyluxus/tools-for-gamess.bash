@@ -9,9 +9,11 @@
 # 
 # The help lines are distributed throughout the script and grepped for
 #
-#hlp   This script will sumbit an iGAMESS input file to the queueing system.
+#hlp   This script will sumbit an GAMESS input file to the queueing system.
 #hlp   It is designed to work on the RWTH compute cluster in 
 #hlp   combination with the slurm queueing system.
+#hlp   There are additional queues available, but they are untested and 
+#hlp   the header/settings are reproduced only from manuals.
 #hlp
 #hlp   This software comes with absolutely no warrenty. None. Nada.
 #hlp
@@ -183,9 +185,9 @@ write_jobscript ()
 
     local scale_memory_percent overhead_memory
     # Give GAMESS some more space by default (define in rc), 
-    # scale everything up, so that gamess uses max 75% of memory
-    # Not really sure that is necessary
-    scale_memory_percent=$(( 75 ))
+    # scale everything up, so that gamess uses max 90% of memory
+    # Not really sure that this is necessary, but as a failsafe it is worth having
+    scale_memory_percent=$(( 90 ))
     debug "Scaling memory by ${scale_memory_percent}% (requested_numCPU=${requested_numCPU})."
     overhead_memory=$(( (requested_memory + gamess_overhead) * 100 / scale_memory_percent ))
     debug "requested_memory=$requested_memory; gamess_overhead=$gamess_overhead"
@@ -269,7 +271,8 @@ write_jobscript ()
 			#SBATCH --output='$submitscript.o%j'
 			#SBATCH --error='$submitscript.e%j'
 			#SBATCH --nodes=1 
-			#SBATCH --ntasks=$requested_numCPU
+			#SBATCH --ntasks=1 
+			#SBATCH --cpus-per-task=$requested_numCPU
 			#SBATCH --mem-per-cpu=$(( overhead_memory / requested_numCPU ))
 			#SBATCH --time=${requested_walltime}
 			#SBATCH --mail-type=END,FAIL
@@ -354,6 +357,8 @@ write_jobscript ()
 			
 			GAMESS_RUN="\$( command -v rungms )" || exit 1
 			GAMESS_DIR="\${GAMESS_RUN%/*}"
+			
+			export GAMESS_DIR GAMESS_RUN
 			
 			EOF
     else
