@@ -2,7 +2,7 @@
 
 ###
 #
-# submit.gamess.sh -- 
+# gamess.submit.sh -- 
 #   a script to submit a GAMESS calculation to a queuing system
 # Copyright (C) 2019 Martin C Schwarzer
 #
@@ -35,7 +35,7 @@
 #hlp   There are additional queues available, but they are untested and 
 #hlp   the header/settings are reproduced only from manuals.
 #hlp
-#hlp   submit.gamess.sh  Copyright (C) 2019  Martin C Schwarzer
+#hlp   gamess.submit.sh  Copyright (C) 2019  Martin C Schwarzer
 #hlp   This program comes with ABSOLUTELY NO WARRANTY; this is free software, 
 #hlp   and you are welcome to redistribute it under certain conditions; 
 #hlp   please see the license file distributed alongside this repository,
@@ -679,8 +679,12 @@ process_options ()
 # MAIN SCRIPT
 #
 
-# If this script is sourced, return before executing anything
-(( ${#BASH_SOURCE[*]} > 1 )) && return 0
+# If this script is not sourced, return before executing anything
+if (return 0 2>/dev/null) ; then
+  # [How to detect if a script is being sourced](https://stackoverflow.com/a/28776166/3180795)
+  echo "This script is not meant to be sourced, skipping execution."
+fi
+
 
 # Save how script was called
 script_invocation_spell="$0 $*"

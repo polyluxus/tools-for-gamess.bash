@@ -25,7 +25,10 @@
 # They can (or should) be set in the rc file, too.
 
 # If this script is not sourced, return before executing anything
-if (( ${#BASH_SOURCE[*]} == 1 )) ; then
+if (return 0 2>/dev/null) ; then
+  # [How to detect if a script is being sourced](https://stackoverflow.com/a/28776166/3180795)
+  : #Everything is fine
+else
   echo "This script is only meant to be sourced."
   exit 0
 fi
@@ -34,7 +37,7 @@ fi
 # Generic details about these tools 
 #
 softwarename="tools-for-gamess.bash"
-version="0.0.2"
+version="0.0.3"
 versiondate="2019-09-09"
 
 #
